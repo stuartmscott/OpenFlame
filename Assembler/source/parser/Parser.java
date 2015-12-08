@@ -55,6 +55,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 
@@ -64,22 +65,24 @@ import main.Assembler;
 
 public class Parser {
 
-    private static final int NUM_GP_REGS = 64;//MAXIMUM OF 64
-    private final Assembler assembler;
-    private final Lexer lex;
-    private final String filename;
+    private static final int GENERAL_PURPOSE_REGISTER_COUNT = 64;//MAXIMUM OF 64
+    private final Assembler mAssembler;
+    private final Lexer mLexer;
+    private final File mFile;
+    private final String mFilename;
 
-    public Parser(Assembler assembler, Lexer lex, String filename) {
-        this.assembler = assembler;
-        this.lex = lex;
-        this.filename = filename;
+    public Parser(Assembler assembler, Lexer lexer, File file) {
+        mAssembler = assembler;
+        mLexer = lexer;
+        mFile = file;
+        mFilename = file.getName();
     }
 
-    private int matchReg() {
-        String s = match(Category.LOWERNAME);
-        if (s.matches("r[0-9]*")) {
-            int val = Integer.parseInt(s.substring(1));
-            if (val > NUM_GP_REGS) {
+    private int matchRegister() {
+        String string = match(Category.LOWERNAME);
+        if (string.matches("r[0-9]*")) {
+            int val = Integer.parseInt(string.substring(1));
+            if (val > GENERAL_PURPOSE_REGISTER_COUNT) {
                 error("register index out of bounds");
             }
             return val;
@@ -90,7 +93,7 @@ public class Parser {
 
     private void move() {
         try {
-            lex.move();
+            mLexer.move();
         } catch (Exception e) {
             error(e.getMessage());
         }
@@ -98,7 +101,7 @@ public class Parser {
 
     private String match(Category c) {
         try {
-            return lex.match(c);
+            return mLexer.match(c);
         } catch (Exception e) {
             error(e.getMessage());
         }
@@ -106,20 +109,20 @@ public class Parser {
     }
 
     private void error(String string) {
-        error(lex.getLineNum(), string);
+        error(mLexer.getLineNumber(), string);
     }
 
     private void error(int lineNum, String string) {
-        Assembler.syntaxError(filename, lineNum, string);
+        Assembler.syntaxError(mFilename, lineNum, string);
     }
 
     public void parse() {
         move();
         do {
-            if (lex.currentIs(Category.INCLUDE)) {
+            if (mLexer.currentIs(Category.INCLUDE)) {
                 move();
                 StringBuilder sb = new StringBuilder();
-                while (!lex.currentIs(Category.UPPERNAME)) {
+                while (!mLexer.currentIs(Category.UPPERNAME)) {
                     sb.append(match(Category.LOWERNAME));
                     match(Category.FSTOP);
                     sb.append(File.separatorChar);
@@ -135,34 +138,35 @@ public class Parser {
                 } else {
                     includeData(fullName);
                 }
-            } else if (lex.currentIs(Category.PADDING)) {
+            } else if (mLexer.currentIs(Category.PADDING)) {
                 move();
                 long count = matchLong();
                 for (int i = 0; i < count;) {
                     i++;
-                    assembler.addStatement(new Data(0, "padding " + i + "/" + count));
+                    mAssembler.addStatement(new Data(0, "padding " + i + "/" + count));
                 }
-            } else if (lex.currentIs(Category.UPPERNAME)) {
+            } else if (mLexer.currentIs(Category.UPPERNAME)) {
                 // scan for constants
-                int l = lex.getLineNum();
-                String name = lex.getCurrentValue();
+                int l = mLexer.getLineNumber();
+                String name = mLexer.getCurrentValue();
                 move();
-                assembler.addConstant(name, matchData(), filename, l);
+                mAssembler.addConstant(name, matchData(), mFilename, l);
             } else {
-                assembler.addStatement(matchStmt());
+                mAssembler.addStatement(matchStatement());
             }
-        } while (lex.getCurrentCategory() != Category.EOF);
+        } while (mLexer.getCurrentCategory() != Category.END_OF_FILE);
     }
 
     public void includeAsm(String fullName) {
         System.out.println("including asm " + fullName);
-        assembler.include(fullName);
+        mAssembler.include(new File(mFile.getParent(), fullName));
     }
 
     public void includeData(String fullName) {
         System.out.println("including data " + fullName);
         try {
-            FileChannel fc = FileChannel.open(Paths.get(fullName), StandardOpenOption.READ);
+            Path path = Paths.get(String.format("%s/%s", mFile.getParent(), fullName));
+            FileChannel fc = FileChannel.open(path, StandardOpenOption.READ);
             ByteBuffer buf = ByteBuffer.allocate(4);
             try {
                 int num = 0;
@@ -171,7 +175,7 @@ public class Parser {
                     buf.clear();
                     num = fc.read(buf);
                     buf.rewind();
-                    assembler.addStatement(new Data(buf.getInt(), ""));
+                    mAssembler.addStatement(new Data(buf.getInt(), ""));
                 }
             } catch (IOException e) {
                 Assembler.ioError(e);
@@ -183,121 +187,121 @@ public class Parser {
         }
     }
 
-    private AsmStmt matchStmt() {
-        int l = lex.getLineNum();
-        String val = lex.getCurrentValue();
-        if (lex.currentIs(Category.LABEL)) {
+    private AsmStmt matchStatement() {
+        int lineNumber = mLexer.getLineNumber();
+        String value = mLexer.getCurrentValue();
+        if (mLexer.currentIs(Category.LABEL)) {
             move();
-            Label lbl = new Label(val, matchOptionalComment());
-            assembler.addLabel(lbl, filename, l);
-            return lbl;
-        } else if (lex.currentIs(Category.DATA)) {
+            Label label = new Label(value, matchOptionalComment());
+            mAssembler.addLabel(label, mFilename, lineNumber);
+            return label;
+        } else if (mLexer.currentIs(Category.DATA)) {
             move();
             return matchData();
         }
         match(Category.LOWERNAME);
-        if (val.startsWith("add")) {
-            return new Add(val.endsWith("f"), matchReg(), matchReg(), matchReg(), matchOptionalComment());
-        } else if (val.startsWith("sub")) {
-            return new Subtract(val.endsWith("f"), matchReg(), matchReg(), matchReg(), matchOptionalComment());
-        } else if (val.startsWith("mul")) {
-            return new Multiply(val.endsWith("f"), matchReg(), matchReg(), matchReg(), matchOptionalComment());
-        } else if (val.startsWith("div")) {
-            return new Divide(val.endsWith("f"), matchReg(), matchReg(), matchReg(), matchOptionalComment());
-        } else if (val.startsWith("mod")) {
-            return new Modulos(val.endsWith("f"), matchReg(), matchReg(), matchReg(), matchOptionalComment());
-        } else if (val.startsWith("convert")) {
-            return new Convert(val.endsWith("f"), matchReg(), matchReg(), matchOptionalComment());
-        } else if (val.equals("copy")) {
-            return new Copy(matchReg(), matchReg(), matchOptionalComment());
-        } else if (val.equals("loadc")) {
-            if (lex.currentIs(Category.LABEL)) {
-                String name = lex.getCurrentValue();
+        if (value.startsWith("add")) {
+            return new Add(value.endsWith("f"), matchRegister(), matchRegister(), matchRegister(), matchOptionalComment());
+        } else if (value.startsWith("sub")) {
+            return new Subtract(value.endsWith("f"), matchRegister(), matchRegister(), matchRegister(), matchOptionalComment());
+        } else if (value.startsWith("mul")) {
+            return new Multiply(value.endsWith("f"), matchRegister(), matchRegister(), matchRegister(), matchOptionalComment());
+        } else if (value.startsWith("div")) {
+            return new Divide(value.endsWith("f"), matchRegister(), matchRegister(), matchRegister(), matchOptionalComment());
+        } else if (value.startsWith("mod")) {
+            return new Modulos(value.endsWith("f"), matchRegister(), matchRegister(), matchRegister(), matchOptionalComment());
+        } else if (value.startsWith("convert")) {
+            return new Convert(value.endsWith("f"), matchRegister(), matchRegister(), matchOptionalComment());
+        } else if (value.equals("copy")) {
+            return new Copy(matchRegister(), matchRegister(), matchOptionalComment());
+        } else if (value.equals("loadc")) {
+            if (mLexer.currentIs(Category.LABEL)) {
+                String name = mLexer.getCurrentValue();
                 move();
-                return new LoadC(name, matchReg(), true, matchOptionalComment());
-            } else if (lex.currentIs(Category.UPPERNAME)) {
-                String name = lex.getCurrentValue();
+                return new LoadC(name, matchRegister(), true, matchOptionalComment());
+            } else if (mLexer.currentIs(Category.UPPERNAME)) {
+                String name = mLexer.getCurrentValue();
                 move();
-                return new LoadC(name, matchReg(), false, matchOptionalComment());
+                return new LoadC(name, matchRegister(), false, matchOptionalComment());
             }
-            return new LoadC(matchLong(), matchReg(), matchOptionalComment());
-        } else if (val.equals("load")) {
-            int r = matchReg();
-            if (lex.currentIs(Category.LABEL)) {
-                String name = lex.getCurrentValue();
+            return new LoadC(matchLong(), matchRegister(), matchOptionalComment());
+        } else if (value.equals("load")) {
+            int r = matchRegister();
+            if (mLexer.currentIs(Category.LABEL)) {
+                String name = mLexer.getCurrentValue();
                 move();
-                return new Load(r, name, matchReg(), true, matchOptionalComment());
-            } else if (lex.currentIs(Category.UPPERNAME)) {
-                String name = lex.getCurrentValue();
+                return new Load(r, name, matchRegister(), true, matchOptionalComment());
+            } else if (mLexer.currentIs(Category.UPPERNAME)) {
+                String name = mLexer.getCurrentValue();
                 move();
-                return new Load(r, name, matchReg(), false, matchOptionalComment());
+                return new Load(r, name, matchRegister(), false, matchOptionalComment());
             }
-            return new Load(r, matchLong(), matchReg(), matchOptionalComment());
-        } else if (val.equals("store")) {
-            int r = matchReg();
-            if (lex.currentIs(Category.LABEL)) {
-                String name = lex.getCurrentValue();
+            return new Load(r, matchLong(), matchRegister(), matchOptionalComment());
+        } else if (value.equals("store")) {
+            int r = matchRegister();
+            if (mLexer.currentIs(Category.LABEL)) {
+                String name = mLexer.getCurrentValue();
                 move();
-                return new Store(r, name, matchReg(), true, matchOptionalComment());
-            } else if (lex.currentIs(Category.UPPERNAME)) {
-                String name = lex.getCurrentValue();
+                return new Store(r, name, matchRegister(), true, matchOptionalComment());
+            } else if (mLexer.currentIs(Category.UPPERNAME)) {
+                String name = mLexer.getCurrentValue();
                 move();
-                return new Store(r, name, matchReg(), false, matchOptionalComment());
+                return new Store(r, name, matchRegister(), false, matchOptionalComment());
             }
-            return new Store(r, matchLong(), matchReg(), matchOptionalComment());
-        } else if (val.equals("push")) {
-            return new Push(matchRegList(true), matchOptionalComment());
-        } else if (val.equals("pop")) {
-            return new Pop(matchRegList(false), matchOptionalComment());
-        } else if (val.equals("jez")) {
-            return new Jez(matchReg(), matchLabel(), matchOptionalComment());
-        } else if (val.equals("jnz")) {
-            return new Jnz(matchReg(), matchLabel(), matchOptionalComment());
-        } else if (val.equals("jlz")) {
-            return new Jlz(matchReg(), matchLabel(), matchOptionalComment());
-        } else if (val.equals("jle")) {
-            return new Jle(matchReg(), matchLabel(), matchOptionalComment());
-        } else if (val.equals("call")) {
-            return new Call(matchReg(), matchOptionalComment());
-        } else if (val.equals("ret")) {
-            return new Return(matchReg(), matchOptionalComment());
-        } else if (val.equals("break")) {
+            return new Store(r, matchLong(), matchRegister(), matchOptionalComment());
+        } else if (value.equals("push")) {
+            return new Push(matchRegisterList(true), matchOptionalComment());
+        } else if (value.equals("pop")) {
+            return new Pop(matchRegisterList(false), matchOptionalComment());
+        } else if (value.equals("jez")) {
+            return new Jez(matchRegister(), matchLabel(), matchOptionalComment());
+        } else if (value.equals("jnz")) {
+            return new Jnz(matchRegister(), matchLabel(), matchOptionalComment());
+        } else if (value.equals("jlz")) {
+            return new Jlz(matchRegister(), matchLabel(), matchOptionalComment());
+        } else if (value.equals("jle")) {
+            return new Jle(matchRegister(), matchLabel(), matchOptionalComment());
+        } else if (value.equals("call")) {
+            return new Call(matchRegister(), matchOptionalComment());
+        } else if (value.equals("ret")) {
+            return new Return(matchRegister(), matchOptionalComment());
+        } else if (value.equals("break")) {
             return new BreakPoint(matchLong(), matchOptionalComment());
-        } else if (val.equals("halt")) {
+        } else if (value.equals("halt")) {
             return new Halt(matchOptionalComment());
-        } else if (val.equals("sleep")) {
+        } else if (value.equals("sleep")) {
             return new Sleep(matchOptionalComment());
-        } else if (val.equals("wait")) {
+        } else if (value.equals("wait")) {
             return new Wait(matchOptionalComment());
-        } else if (val.equals("noop")) {
+        } else if (value.equals("noop")) {
             return new Noop(matchOptionalComment());
-        } else if (val.equals("cmd")) {
-            if (lex.currentIs(Category.UPPERNAME)) {
-                return new Command(matchConstant(), matchReg(), matchOptionalComment());
+        } else if (value.equals("cmd")) {
+            if (mLexer.currentIs(Category.UPPERNAME)) {
+                return new Command(matchConstant(), matchRegister(), matchOptionalComment());
             }
-            return new Command(matchLong(), matchReg(), matchOptionalComment());
-        } else if (val.equals("signal")) {
-            return new Signal(matchReg(), matchOptionalComment());
-        } else if (val.equals("intr")) {
-            if (lex.currentIs(Category.UPPERNAME)) {
+            return new Command(matchLong(), matchRegister(), matchOptionalComment());
+        } else if (value.equals("signal")) {
+            return new Signal(matchRegister(), matchOptionalComment());
+        } else if (value.equals("intr")) {
+            if (mLexer.currentIs(Category.UPPERNAME)) {
                 return new Interrupt(matchConstant(), matchOptionalComment());
             }
             return new Interrupt(matchLong(), matchOptionalComment());
-        } else if (val.equals("iret")) {
-            return new InterruptReturn(matchReg(), matchOptionalComment());
-        } else if (val.equals("lock")) {
+        } else if (value.equals("iret")) {
+            return new InterruptReturn(matchRegister(), matchOptionalComment());
+        } else if (value.equals("lock")) {
             return new Lock(matchOptionalComment());
-        } else if (val.equals("unlock")) {
+        } else if (value.equals("unlock")) {
             return new Unlock(matchOptionalComment());
         }
-        error(l, "unrecognised instruction: " + val);
+        error(lineNumber, "unrecognised instruction: " + value);
         return null;
     }
 
     private String matchOptionalComment() {
-        if (lex.currentIs(Category.COMMENT)) {
+        if (mLexer.currentIs(Category.COMMENT)) {
             // Get the comment, minus the slashes
-            String comment = lex.getCurrentValue().substring(2);
+            String comment = mLexer.getCurrentValue().substring(2);
             move();
             return comment;
         }
@@ -305,8 +309,8 @@ public class Parser {
     }
 
     private Data matchData() {
-        if (lex.currentIs(Category.LABEL)) {
-            String value = lex.getCurrentValue();
+        if (mLexer.currentIs(Category.LABEL)) {
+            String value = mLexer.getCurrentValue();
             move();
             return new Data(value, matchOptionalComment());
         }
@@ -325,37 +329,40 @@ public class Parser {
         return match(Category.UPPERNAME);
     }
 
-    private long matchRegList(boolean ascending) {
+    private long matchRegisterList(boolean ascending) {
         long mask = 0;
-        int i = ascending ? 3 : NUM_GP_REGS;
+        int i = ascending ? 3 : GENERAL_PURPOSE_REGISTER_COUNT;
+
+        int register = matchRegister();
         // If the next two tokens are full stops then match range, else match comma separated list
-        if (lex.peek().cat.equals(Category.FSTOP)) {
-            int regStart = matchReg();
+        if (mLexer.currentIs(Category.FSTOP)) {
             match(Category.FSTOP);
             match(Category.FSTOP);
-            int regEnd = matchReg();
-            if (ascending && (regStart <= i || regEnd <= regStart))
+            int endRegister = matchRegister();
+            if (ascending && (register <= i || endRegister <= register)) {
                 error("register list is not in ascending order");
-            else if (!ascending && (regStart >= i || regEnd >= regStart))
+            } else if (!ascending && (register >= i || endRegister >= register)) {
                 error("register list is not in descending order");
-            int start = ascending ? regStart : regEnd;
-            int end = ascending ? regEnd : regStart;
+            }
+            int start = ascending ? register : endRegister;
+            int end = ascending ? endRegister : register;
             for (int j = start; j <= end; j++) {
-                mask = mask | (1L << (NUM_GP_REGS - 1 - j));
+                mask = mask | (1L << (GENERAL_PURPOSE_REGISTER_COUNT - 1 - j));
             }
         } else {
             boolean repeat;
             do {
-                int reg = matchReg();
-                if (ascending && reg <= i)
+                if (ascending && register <= i) {
                     error("register list is not in ascending order");
-                else if (!ascending && reg >= i)
+                } else if (!ascending && register >= i) {
                     error("register list is not in descending order");
-                i = reg;
-                mask = mask | (1L << (NUM_GP_REGS - 1 - i));
-                repeat = lex.currentIs(Category.COMMA);
-                if (repeat)
+                }
+                i = register;
+                mask = mask | (1L << (GENERAL_PURPOSE_REGISTER_COUNT - 1 - i));
+                repeat = mLexer.currentIs(Category.COMMA);
+                if (repeat) {
                     move();
+                }
             } while (repeat);
         }
         return mask;

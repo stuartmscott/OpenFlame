@@ -20,13 +20,13 @@ package internalrep.asm.controlflow;
 
 public class Jnz extends Jump {
 
-    public Jnz(int condRegIndex, String dest, String comment) {
-        super(NZ, condRegIndex, dest, comment);
-        // if condReg anything but 0, program flow will be directed to dest
+    public Jnz(int conditionRegister, String destination, String comment) {
+        super(NZ, conditionRegister, destination, comment);
+        // if conditionRegister anything but 0, program flow will be directed to destination
     }
 
     public String toString() {
-        return "jnz r" + condRegIndex + " " + dest + super.toString();
+        return "jnz r" + mConditionRegister + " " + mDestination + super.toString();
     }
 
 }

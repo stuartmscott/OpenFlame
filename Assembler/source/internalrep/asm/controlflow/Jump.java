@@ -30,38 +30,39 @@ public abstract class Jump extends AsmStmt implements Emittable, Linkable {
     public static final int LZ = 2;
     public static final int LE = 3;
 
-    protected long condCode;
-    protected int condRegIndex;
-    protected String dest;
+    protected long mConditionCode;
+    protected int mConditionRegister;
+    protected String mDestination;
     private Label label;
 
-    public Jump(long condCode, int condRegIndex, String dest, String comment) {
+    public Jump(long conditionCode, int conditionRegister, String destination, String comment) {
         super(comment);
         // Note: as some numbers are floats other are ints, jumps only have
         // ez (z), nz (!z), lz (n), le (n|z) as numbers can easily be easily tested:
         //  z = all bits zero
-        //  n = MSB set
+        //  n = most significant bit (MSB) set
         // All jumps are relative, so use dest.address - address to get
         // relative offset, this must be small enough to store in the
         // instruction
-        this.condCode = condCode;
-        this.condRegIndex = condRegIndex;
-        this.dest = dest;
+        mConditionCode = conditionCode;
+        mConditionRegister = conditionRegister;
+        mDestination = destination;
     }
 
     public void link(Linker l) {
-        if (dest != null)
-            label = l.getLabel(dest);
+        if (mDestination != null) {
+            label = l.getLabel(mDestination);
+        }
     }
 
     public long emit() {
-        // 1 condCode bkwd offset condReg
-        long destAddr = label.getRelative(address);
+        // Format: 1 conditionCode backward address conditionRegister
+        long destinationAddress = label.getRelative(mAddress);
         long backward = 0;
-        if (destAddr < 0) {
+        if (destinationAddress < 0) {
             backward = 1;
-            destAddr*=-1;
+            destinationAddress *= -1;
         }
-        return (1L << 63L) | (condCode << 61L) | (backward << 60L) | (destAddr << 12L) | (condRegIndex);
+        return (1L << 63L) | (mConditionCode << 61L) | (backward << 60L) | (destinationAddress << 12L) | (mConditionRegister);
     }
 }

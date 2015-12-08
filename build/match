@@ -1,5 +1,3 @@
-# !/bin/bash
-#
 # Copyright 2015 Stuart Scott
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,5 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# TODO error if match/openflamebuild,junit,mockito or any other libraries don't exist
-java -cp libraries/Match-0.2.jar:libraries/OpenFlameBuild-0.1.jar main.Match .
+JavaJar(
+	name = "OpenFlameBuild"
+	source = Find("source")
+	library = [
+		"match"
+	]
+	main_class = "main.Match"
+)

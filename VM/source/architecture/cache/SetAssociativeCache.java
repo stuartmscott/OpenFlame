@@ -221,7 +221,7 @@ public class SetAssociativeCache extends HierarchicalCache {
             }
         }
         if (!redo) {
-            // writeback is only complete when the writeRequests is empty
+            // writeback is only complete when the mWriteRequests is empty
             // and there are no pending writes
             return mWriteRequests.size() > 0;
         }

@@ -20,14 +20,14 @@ package internalrep.asm.arithmeticlogic;
 
 public class Multiply extends AluInst {
 
-    public Multiply(boolean isFloat, int srcReg1, int srcReg2, int destReg, String comment) {
-        // Multiply srcReg1 by srcReg2 and put result in destReg
-        // destReg = srcReg1*srcReg2
-        super(isFloat, MULTIPLY, srcReg1, srcReg2, destReg, comment);
+    public Multiply(boolean isFloat, int source1, int source2, int destination, String comment) {
+        // Multiply source1 by source2 and put result in destination
+        // destination = source1*source2
+        super(isFloat, MULTIPLY, source1, source2, destination, comment);
     }
 
     public String toString() {
-        return "mul r" + mSource1Index + " r" + mSource2Index + " r" + mDestinationIndex + super.toString();
+        return "mul r" + mSource1 + " r" + mSource2 + " r" + mDestination + super.toString();
     }
 
 }

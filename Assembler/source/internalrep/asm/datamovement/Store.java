@@ -26,55 +26,56 @@ import linker.Linker;
 
 public class Store extends AsmStmt implements Emittable, Linkable {
 
-    private long displacement;
-    private int baseRegIndex;
-    private int srcRegIndex;
-    private boolean isLabel = false;
-    private Label label;
-    private String name;
+    private long mOffset;
+    private int mBaseRegister;
+    private int mSourceRegister;
+    private boolean mIsLabel = false;
+    private Label mLabel;
+    private String mName;
 
-    public Store(int baseRegIndex, long displacement, int srcRegIndex, String comment) {
+    public Store(int baseRegister, long offset, int sourceRegister, String comment) {
         super(comment);
-        //Stores data in srcReg to mem[baseReg+displacement]
-        this.baseRegIndex = baseRegIndex;
-        this.displacement = displacement;
-        this.srcRegIndex = srcRegIndex;
+        //Stores data in srcReg to memory[baseRegister+offset]
+        mBaseRegister = baseRegister;
+        mOffset = offset;
+        mSourceRegister = sourceRegister;
     }
 
     public Store(int baseRegIndex, String name, int srcRegIndex, boolean isLabel, String comment) {
         super(comment);
-        this.baseRegIndex = baseRegIndex;
-        this.name = name;
-        this.isLabel = isLabel;
-        this.srcRegIndex = srcRegIndex;
+        mBaseRegister = baseRegIndex;
+        mName = name;
+        mIsLabel = isLabel;
+        mSourceRegister = srcRegIndex;
     }
 
     private void resolve() {
-        if (isLabel && label != null)
-            displacement = label.getAbsolute();
+        if (mIsLabel && mLabel != null)
+            mOffset = mLabel.getAbsolute();
     }
 
     public void link(Linker linker) {
-        if (name != null) {
-            if (isLabel)
-                label = linker.getLabel(name);
-            else
-                displacement = linker.getConstant(name);
+        if (mName != null) {
+            if (mIsLabel) {
+                mLabel = linker.getLabel(mName);
+            } else {
+                mOffset = linker.getConstant(mName);
+            }
         }
     }
 
     public long emit() {
-        // 0101 offset base dest
+        // 0101 offset base source
         resolve();
-        return (5L << 60L) | (displacement << 12L) | (baseRegIndex << 6L) | (srcRegIndex);
+        return (5L << 60L) | (mOffset << 12L) | (mBaseRegister << 6L) | (mSourceRegister);
     }
 
     public String toString() {
         resolve();
-        if (name != null) {
-            return "store r" + baseRegIndex + " " + name + " r" + srcRegIndex + super.toString();
+        if (mName != null) {
+            return "store r" + mBaseRegister + " " + mName + " r" + mSourceRegister + super.toString();
         }
-        return "store r" + baseRegIndex + " " + displacement + " r" + srcRegIndex + super.toString();
+        return "store r" + mBaseRegister + " " + mOffset + " r" + mSourceRegister + super.toString();
     }
 
 }

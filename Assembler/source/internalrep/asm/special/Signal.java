@@ -20,19 +20,19 @@ package internalrep.asm.special;
 
 public class Signal extends Special {
 
-    private int deviceIdRegIndex;
+    private int mDeviceIdRegister;
 
-    public Signal(int deviceIdRegIndex, String comment) {
+    public Signal(int deviceIdRegister, String comment) {
         super(SIGNAL, comment);
-        this.deviceIdRegIndex = deviceIdRegIndex;
+        mDeviceIdRegister = deviceIdRegister;
     }
 
     public long emit() {
-        return super.emit() | deviceIdRegIndex;
+        return super.emit() | mDeviceIdRegister;
     }
 
     public String toString() {
-        return "signal r" + deviceIdRegIndex + super.toString();
+        return "signal r" + mDeviceIdRegister + super.toString();
     }
 
 }

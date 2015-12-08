@@ -27,24 +27,24 @@ public abstract class Special extends AsmStmt implements Emittable {
     public static final int SLEEP = 1;
     public static final int WAIT = 2;
     public static final int NOOP = 3;
-    public static final int CMD = 4;
+    public static final int COMMAND = 4;
     public static final int SIGNAL = 5;
-    public static final int INTR = 6;
-    public static final int IRET = 7;
+    public static final int INTERRUPT = 6;
+    public static final int INTERRUPT_RETURN = 7;
     public static final int LOCK = 8;
     public static final int UNLOCK = 9;
     public static final int BREAK = 10;
 
-    protected final long type;
+    protected final long mType;
 
     public Special(long type, String comment) {
         super(comment);
-        this.type = type;
+        mType = type;
     }
 
     public long emit() {
-        // 0000 01 type cn32 reg1 reg2
-        return (1L << 58L) | (type << 54L);
+        // 0000 01 type constant32 register1 register2
+        return (1L << 58L) | (mType << 54L);
     }
 
 }

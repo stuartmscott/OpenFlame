@@ -19,42 +19,44 @@
 package internalrep.asm;
 
 import io.Addressable;
+
 import java.util.Arrays;
-import main.Assembler;
 
 public abstract class AsmStmt implements Addressable {
 
     // TODO ensure that bits don't overrun when emitting
 
-    public final String comment;
-    public long address = -1;
-    public AsmStmt next;
+    public final String mComment;
+    public long mAddress = -1;
+    public AsmStmt mNext;
 
     public AsmStmt(String comment) {
-        this.comment = comment;
+        mComment = comment;
     }
 
     public void setAddress(long address) {
-        this.address = address;
+        mAddress = address;
     }
 
     public long getAddress() {
-        return address;
+        return mAddress;
     }
 
     public String toString() {
-        if (comment == null || comment.equals(""))
+        if (mComment == null || mComment.equals("")) {
             return "";
-        else
-            return " //" + comment;
+        } else {
+            return " //" + mComment;
+        }
     }
 
-    public static String padStr(long value, int base, int length) {
+    public static String padString(long value, int base, int length) {
         String s = Long.toString(value, base);
         StringBuilder sb = new StringBuilder(length);
         int len = length - s.length();
-        if (len <= 0)
+        if (len <= 0) {
             return s;
+        }
         char[] zeros = new char[len];
         Arrays.fill(zeros, '0');
         sb.append(zeros);

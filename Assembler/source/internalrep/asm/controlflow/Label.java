@@ -22,29 +22,29 @@ import internalrep.asm.AsmStmt;
 
 public class Label extends AsmStmt {
 
-    private static int curr_id = 0;
-    public int references = 0;
-    public String name;
+    private static int sCurrentId = 0;
+    public int mReferences = 0;
+    public String mName;
 
     public Label(String comment) {
-        this("#_lbl" + curr_id++, comment);
+        this("#_label" + sCurrentId++, comment);
     }
 
     public Label(String name, String comment) {
         super(comment);
-        this.name = name;
+        mName = name;
     }
 
     public String toString() {
-        return name + super.toString();
+        return mName + super.toString();
     }
 
     public long getAbsolute() {
-        return this.address;
+        return mAddress;
     }
 
     public long getRelative(long address) {
-        return this.address - address;
+        return mAddress - address;
     }
 
 }

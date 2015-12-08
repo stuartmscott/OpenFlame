@@ -23,20 +23,20 @@ import io.Emittable;
 
 public class Pop extends AsmStmt implements Emittable {
 
-    private long mask;
+    private long mMask;
 
     public Pop(long mask, String comment) {
         super(comment);
-        this.mask = mask;
+        mMask = mask;
     }
 
     public long emit() {
         // 0110 mask
-        return (6L << 60L) | mask;
+        return (6L << 60L) | mMask;
     }
 
     public String toString() {
-        return "pop" + mask + super.toString();
+        return "pop " + mMask + super.toString();
     }
 
 }

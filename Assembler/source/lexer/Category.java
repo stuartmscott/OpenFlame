@@ -20,14 +20,8 @@ package lexer;
 
 public enum Category {
 
-    EOF, NEWLINE, WHITESPACE, ASSIGN,
+    END_OF_FILE, NEW_LINE, WHITESPACE,
     COLON, COMMA, FSTOP, //Special Characters
-    COMMENT,
-    OCB, CCB, ORB, CRB, OSB, CSB, OAB, CAB, //Brackets
-    IMPORT, AS, MODULE, CLASS, PROTOCOL, //File structure
-    NEW, //Creation
-    IF, ELSE, DO, WHILE, FOR, MATCH, RETURN, BREAK, //Control
-    NUMBER_LITERAL, BOOLEAN_LITERAL, STRING_LITERAL,//Literals
-    UPPERNAME, LOWERNAME,//Identifiers
+    COMMENT, UPPERNAME, LOWERNAME, NUMBER_LITERAL,
     INCLUDE, PADDING, DATA, ASM, LABEL,//Assembly
 }

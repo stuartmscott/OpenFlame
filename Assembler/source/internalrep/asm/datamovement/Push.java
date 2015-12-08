@@ -23,20 +23,20 @@ import io.Emittable;
 
 public class Push extends AsmStmt implements Emittable {
 
-    private long mask;
+    private long mMask;
 
     public Push(long mask, String comment) {
         super(comment);
-        this.mask = mask;
+        mMask = mask;
     }
 
     public long emit() {
         // 0111 mask
-        return (7L << 60L) | mask;
+        return (7L << 60L) | mMask;
     }
 
     public String toString() {
-        return "push" + mask + super.toString();
+        return "push " + mMask + super.toString();
     }
 
 }

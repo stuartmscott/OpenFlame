@@ -12,15 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-java_jar(
+JavaJar(
     name = "Vm"
-    source = find("source")
+    source = Find("source")
     main_class = "main.Vm"
 )
 
-java_jar(
+JavaJar(
     name = "VmTest"
-    source = find("tests/source")
+    source = Find("tests/source")
     main_class = "main.AllTests"
     library = [
         "Vm"
@@ -30,7 +30,7 @@ java_jar(
     ]
 )
 
-java_junit(
+JavaJUnit(
     name = "VmTestResult"
     library = [
         "VmTest"

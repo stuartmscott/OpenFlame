@@ -20,13 +20,13 @@ package internalrep.asm.controlflow;
 
 public class Jle extends Jump {
 
-    public Jle(int condRegIndex, String dest, String comment) {
-        super(LE, condRegIndex, dest, comment);
-        // if condReg less than or equal to 0, program flow will be directed to dest
+    public Jle(int conditionRegister, String destination, String comment) {
+        super(LE, conditionRegister, destination, comment);
+        // if conditionRegister less than or equal to 0, program flow will be directed to destination
     }
 
     public String toString() {
-        return "jle r" + condRegIndex + " " + dest + super.toString();
+        return "jle r" + mConditionRegister + " " + mDestination + super.toString();
     }
 
 }

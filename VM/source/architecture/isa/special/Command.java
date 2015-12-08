@@ -28,12 +28,12 @@ public class Command extends Special {
     public static final int GET_ERROR_ID = 3;
     public static final int HAS_LOCK = 4;
     public static final int IS_IN_INTERRUPT = 5;
-    public static final int GET_IVT_ADDR = 6;
-    public static final int SET_IVT_ADDR = 7;
+    public static final int GET_INTERRUPT_TABLE_ADDRESS = 6;
+    public static final int SET_INTERRUPT_TABLE_ADDRESS = 7;
     public static final int GET_TIME = 8;
     public static final int SET_TIME = 9;
-    public static final int GET_PID = 10;
-    public static final int SET_PID = 11;
+    public static final int GET_PROCESS_ID = 10;
+    public static final int SET_PROCESS_ID = 11;
     public static final int GET_CODE_BASE = 12;
     public static final int SET_CODE_BASE = 13;
     public static final int GET_STACK_START = 14;
@@ -41,9 +41,9 @@ public class Command extends Special {
     public static final int GET_STACK_LIMIT = 16;
     public static final int SET_STACK_LIMIT = 17;
 
-    public static final int DCACHE_CLEAR = 18;
-    public static final int DCACHE_FLUSH = 19;
-    public static final int ICACHE_CLEAR = 20;
+    public static final int DATA_CACHE_CLEAR = 18;
+    public static final int DATA_CACHE_FLUSH = 19;
+    public static final int INSTRUCTION_CACHE_CLEAR = 20;
 
     public final long mType;
     public final int mRegisterIndex;
@@ -72,10 +72,10 @@ public class Command extends Special {
             case GET_ERROR_ID:
                 mPipeline.setExecuteRegister0(mContext.getErrorId());
                 break;
-            case GET_IVT_ADDR:
+            case GET_INTERRUPT_TABLE_ADDRESS:
                 mPipeline.setExecuteRegister0(mCard.getInterruptTableAddress());
                 break;
-            case SET_IVT_ADDR:
+            case SET_INTERRUPT_TABLE_ADDRESS:
                 mCard.setInterruptTableAddress(mPipeline.getLoadRegister0());
                 break;
             case GET_TIME:
@@ -84,10 +84,10 @@ public class Command extends Special {
             case SET_TIME:
                 System.err.println("Pointless setting time in simulator.");
                 break;
-            case GET_PID:
+            case GET_PROCESS_ID:
                 mPipeline.setExecuteRegister0(mContext.getProcessId());
                 break;
-            case SET_PID:
+            case SET_PROCESS_ID:
                 mContext.setProcessId(mPipeline.getLoadRegister0());
                 break;
             case GET_CODE_BASE:
@@ -108,15 +108,15 @@ public class Command extends Special {
             case SET_STACK_LIMIT:
                 mContext.setStackLimit(mPipeline.getLoadRegister0());
                 break;
-            case DCACHE_CLEAR:
+            case DATA_CACHE_CLEAR:
                 mCard.getDataStore().clear(mPipeline.getLoadRegister0());
                 mCard.getLowerStore().clear(mPipeline.getLoadRegister0());
                 break;
-            case DCACHE_FLUSH:
+            case DATA_CACHE_FLUSH:
                 boolean retry = mCard.getDataStore().flush(mPipeline.getLoadRegister0());
                 mContext.setRetry(retry | mCard.getLowerStore().flush(mPipeline.getLoadRegister0()));
                 break;
-            case ICACHE_CLEAR:
+            case INSTRUCTION_CACHE_CLEAR:
                 mCard.getInstructionStore().clear(mPipeline.getLoadRegister0());
                 mCard.getLowerStore().clear(mPipeline.getLoadRegister0());
                 break;
@@ -135,9 +135,9 @@ public class Command extends Special {
                 || mType == GET_CONTEXT_ID
                 || mType == GET_DEVICE_ID
                 || mType == GET_ERROR_ID
-                || mType == GET_IVT_ADDR
+                || mType == GET_INTERRUPT_TABLE_ADDRESS
                 || mType == GET_TIME
-                || mType == GET_PID
+                || mType == GET_PROCESS_ID
                 || mType == GET_CODE_BASE
                 || mType == GET_STACK_START
                 || mType == GET_STACK_LIMIT) {

@@ -27,10 +27,10 @@ public abstract class Special extends Instruction {
     public static final int SLEEP = 1;
     public static final int WAIT = 2;
     public static final int NOOP = 3;
-    public static final int CMD = 4;
+    public static final int COMMAND = 4;
     public static final int SIGNAL = 5;
-    public static final int INTR = 6;
-    public static final int IRET = 7;
+    public static final int INTERRUPT = 6;
+    public static final int INTERRUPT_RETURN = 7;
     public static final int LOCK = 8;
     public static final int UNLOCK = 9;
     public static final int BREAK = 10;

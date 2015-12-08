@@ -20,20 +20,20 @@ package lexer;
 
 public class Token {
 
-    public Category cat;
-    public String value;
-    
-    public Token(Category c) {
-        this(c, "");
+    public Category mCategory;
+    public String mValue;
+
+    public Token(Category category) {
+        this(category, "");
     }
 
-    public Token(Category c, String v) {
-        this.cat = c;
-        this.value = v;
+    public Token(Category category, String value) {
+        mCategory = category;
+        mValue = value;
     }
-    
+
     public String toString() {
-        return cat+" : "+value;
+        return mCategory + " : " + mValue;
     }
-    
+
 }

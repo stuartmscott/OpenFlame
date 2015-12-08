@@ -20,14 +20,14 @@ package internalrep.asm.arithmeticlogic;
 
 public class Subtract extends AluInst {
 
-    public Subtract(boolean isFloat, int srcReg1, int srcReg2, int destReg, String comment) {
-        // Subtracts from srcReg1 the value srcReg2 and puts result in destReg
-        // destReg = srcReg1-srcReg2
-        super(isFloat, SUB, srcReg1, srcReg2, destReg, comment);
+    public Subtract(boolean isFloat, int source1, int source2, int destination, String comment) {
+        // Subtracts from source1 the value source2 and puts result in destination
+        // destination = source1-source2
+        super(isFloat, SUB, source1, source2, destination, comment);
     }
 
     public String toString() {
-        return "sub r" + mSource1Index + " r" + mSource2Index + " r" + mDestinationIndex + super.toString();
+        return "sub r" + mSource1 + " r" + mSource2 + " r" + mDestination + super.toString();
     }
 
 }

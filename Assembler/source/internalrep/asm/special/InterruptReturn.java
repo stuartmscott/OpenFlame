@@ -20,19 +20,19 @@ package internalrep.asm.special;
 
 public class InterruptReturn extends Special {
 
-    private int paramRegIndex;
+    private int parameterRegister;
 
-    public InterruptReturn(int paramRegIndex, String comment) {
-        super(IRET, comment);
-        this.paramRegIndex = paramRegIndex;
+    public InterruptReturn(int parameterRegister, String comment) {
+        super(INTERRUPT_RETURN, comment);
+        this.parameterRegister = parameterRegister;
     }
 
     public long emit() {
-        return super.emit() | paramRegIndex;
+        return super.emit() | parameterRegister;
     }
 
     public String toString() {
-        return "iret r" + paramRegIndex + super.toString();
+        return "iret r" + parameterRegister + super.toString();
     }
 
 }

@@ -27,7 +27,7 @@ public class Add extends AluInst {
     }
 
     public String toString() {
-        return "add r" + mSource1Index + " r" + mSource2Index + " r" + mDestinationIndex + super.toString();
+        return "add r" + mSource1 + " r" + mSource2 + " r" + mDestination + super.toString();
     }
 
 }

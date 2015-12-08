@@ -1,0 +1,112 @@
+#ports
+    ON 0 //0 << 32
+    WRITE 12884901888 //3 << 32
+    SET_INTERRUPT_TABLE_ADDRESS 7
+    DATA_CACHE_CLEAR 18
+    DATA_CACHE_FLUSH 19
+    SIGNAL 1
+
+    loadc #start r4             //load start of bootloader
+    iret r4                     //return out of signal interrupt
+
+#savedState
+    data 0                      //pc
+    data 0                      //device index
+    data 0                      //loop index
+    data 0                      //string length
+    data 0                      //string address
+    data 0                      //command
+
+#characterDevice
+    data 0
+
+#length
+    data 12
+#string
+    data 72                     //H
+    data 101                    //e
+    data 108                    //l
+    data 108                    //l
+    data 111                    //o
+    data 32                     //
+    data 87                     //W
+    data 111                    //o
+    data 114                    //r
+    data 108                    //l
+    data 100                    //d
+    data 33                     //!
+
+#start
+// Set the interrupt vector table of the card
+    loadc #interruptTable r6    //load address of interrupt vector table
+    cmd SET_INTERRUPT_TABLE_ADDRESS r6//set the interruptTable address (this address is also the storage port)
+
+// Turn character device on
+    loadc 8 r6                  //load device index
+    loadc ON r10                //load ON command
+    store r6 0 r10              //write out ON command
+    cmd DATA_CACHE_FLUSH r6     //flush value
+    loadc #_return1 r5          //load return label
+    intr SIGNAL                 //signal device and wait
+#_return1
+
+// Write string
+// r5 return address
+// r6 device index
+// r7 saved state
+// r8 loop index
+// r9 string length
+// r10 string address
+// r11 character
+// r12 command
+    loadc WRITE r12             //load WRITE command
+    copy r0 r8                  //load index
+    load r0 #length r9          //load length
+    loadc #string r10           //load string address
+#writeCharacter
+    add r10 r8 r11              //calculate character address
+    load r11 0 r11              //load character
+    add r11 r12 r13             //add to create command
+    store r6 0 r13              //write out WRITE command
+    cmd DATA_CACHE_FLUSH r6     //flush value
+    loadc #_return2 r5          //load return label
+    intr SIGNAL                 //signal device and wait
+#_return2
+    add r8 r1 r8                //increment loop index
+    sub r9 r8 r11               //test loop index
+    jnz r11 #writeCharacter     //loop
+
+    jez r0 #end                 //Jump to the end
+#end
+    halt
+
+#interruptTable
+    jez r0 #signalReceived
+    jez r0 #signalDeviceAndWait
+
+#signalDeviceAndWait
+    signal r6                   //signal device
+    //save state
+    loadc #savedState r7        //load address of saved state
+    store r7 0 r5               //save return address
+    store r7 1 r6               //save device index
+    store r7 2 r8               //save loop index
+    store r7 3 r9               //save string length
+    store r7 4 r10              //save string address
+    store r7 5 r12              //save command
+    loadc #sleep r4             //load addr of sleep
+    iret r4                     //return from interrupt into sleep
+
+#sleep
+    sleep
+
+#signalReceived
+    //restore state
+    loadc #savedState r7        //load address of saved state
+    load r7 5 r12               //restore command
+    load r7 4 r10               //restore string address
+    load r7 3 r9                //restore string length
+    load r7 2 r8                //restore loop index
+    load r7 1 r6                //restore device index
+    load r7 0 r5                //restore return address
+    iret r5                     //return from interrupt

@@ -25,45 +25,46 @@ import linker.Linker;
 
 public class Data extends AsmStmt implements Emittable, Linkable {
 
-    public long value;
-    public Label label;
-    private String name;
+    public long mValue;
+    public Label mLabel;
+    private String mName;
 
     public Data(long value, String comment) {
         super(comment);
-        this.value = value;
+        mValue = value;
     }
 
     public Data(Label label, String comment) {
         super(comment);
-        this.label = label;
+        mLabel = label;
     }
 
     public Data(String name, String comment) {
         super(comment);
-        this.name = name;
+        mName = name;
     }
 
     public String toString() {
-        if (label != null)
-            return "data " + label.name + super.toString();
-        return "data " + value + super.toString() + " // \'" + (char) (value + '\0') + "\' : "+ Long.toHexString(value) + " : " + Long.toBinaryString(value);
+        if (mLabel != null) {
+            return "data " + mLabel.mName + super.toString();
+        }
+        return "data " + mValue + super.toString() + " // \'" + (char) (mValue + '\0') + "\' : "+ Long.toHexString(mValue) + " : " + Long.toBinaryString(mValue);
     }
 
     public void link(Linker l) {
-        if (name != null) {
-            label = l.getLabel(name);
+        if (mName != null) {
+            mLabel = l.getLabel(mName);
         }
     }
 
     public long emit() {
         toValue();
-        return value;
+        return mValue;
     }
 
     private void toValue() {
-        if (label != null) {
-            value = label.address;
+        if (mLabel != null) {
+            mValue = mLabel.mAddress;
         }
     }
 
