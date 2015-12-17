@@ -29,7 +29,7 @@ Set(
 
 Set(
 	name = "match"
-	value = "./libraries/Match-0.2.jar"
+	value = "./libraries/Match-0.3.jar"
 )
 
 Set(
