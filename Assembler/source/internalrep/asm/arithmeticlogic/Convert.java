@@ -20,13 +20,13 @@ package internalrep.asm.arithmeticlogic;
 
 public class Convert extends AluInst {
 
-    public Convert(boolean isFloat, int srcReg, int destReg, String comment) {
-        // Changes the value in srcReg to float (if isFloat) or to an integer (if !isFloat)
-        super(isFloat, CONVERT, srcReg, 0, destReg, comment);
+    public Convert(boolean isFloat, int source, int destination, String comment) {
+        // Changes the value in source to float (if isFloat) or to an integer (if !isFloat)
+        super(isFloat, CONVERT, source, 0, destination, comment);
     }
 
     public String toString() {
-        return "convert r" + mSource1Index + " r" + mDestinationIndex + super.toString();
+        return "convert r" + mSource1 + " r" + mDestination + super.toString();
     }
 
 }

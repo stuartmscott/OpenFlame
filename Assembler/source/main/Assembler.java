@@ -39,37 +39,36 @@ import parser.Parser;
 
 public class Assembler {
 
-    private final Map<String, Label> labels = new HashMap<String, Label>();
-    private final Map<String, Data> constants = new HashMap<String, Data>();
-    private AsmStmt mFirstStmt = null;
-    private AsmStmt mCurrentStmt = null;
+    private final Map<String, Label> mLabels = new HashMap<String, Label>();
+    private final Map<String, Data> mConstants = new HashMap<String, Data>();
+    private AsmStmt mFirstStatement = null;
+    private AsmStmt mCurrentStatement = null;
 
     private final String mMain;
-    private final String mSourceDirectory;
     private final String mBinary;
-    private final String mLog;
     private final Set<String> mFiles;
 
-    private Assembler(String main, String sourceDirectory, String binary, String log, Set<String> files) {
-        this.mMain = main;
-        this.mSourceDirectory = sourceDirectory;
-        this.mBinary = binary;
-        this.mLog = log;
-        this.mFiles = files;
+    private Assembler(String main, String binary, Set<String> files) {
+        mMain = main;
+        mBinary = binary;
+        mFiles = files;
     }
 
     private void run() {
-        final File binFile = new File(mBinary);
-        final File logFile = new File(mLog);
-        include(mMain);
+        final File mainFile = new File(mMain);
+        final String name = mainFile.getName().split("\\.")[0];
+        final File binaryFile = new File(mBinary);
+        binaryFile.getParentFile().mkdirs();
+        final File logFile = new File(String.format("%s.log", binaryFile.getAbsolutePath()));
+        include(mainFile);
         // linker
-        final Linker l = new Linker(constants, labels, mFirstStmt);
+        final Linker l = new Linker(mConstants, mLabels, mFirstStatement);
         l.link();
         // optimizer
-        final Optimizer o = new Optimizer(mFirstStmt);
+        final Optimizer o = new Optimizer(mFirstStatement);
         List<Emittable> stmts = o.reduce();
         // writer
-        final Writer w = new Writer(binFile, logFile, stmts);
+        final Writer w = new Writer(binaryFile, logFile, stmts);
         try {
             w.write();
         } catch (IOException e) {
@@ -77,62 +76,64 @@ public class Assembler {
         }
     }
 
-    public void include(String file) {
-        String fullpath = String.format("%s/%s", mSourceDirectory, file);
+    public void include(File file) {
+        String fullpath = file.getAbsolutePath();
         if (!mFiles.contains(fullpath)) {
             error(String.format("%s was not in the file list", file));
         }
         // Lexem
-        final Lexer l = new Lexer(fullpath);
+        final Lexer l = new Lexer(file);
         // parser
-        final Parser p = new Parser(this, l, fullpath);
+        final Parser p = new Parser(this, l, file);
         p.parse();
     }
 
     public void addStatement(AsmStmt asm) {
-        if (mFirstStmt == null) {
-            mFirstStmt = asm;
+        if (mFirstStatement == null) {
+            mFirstStatement = asm;
         } else {
-            mCurrentStmt.next = asm;
+            mCurrentStatement.mNext = asm;
         }
-        mCurrentStmt = asm;
+        mCurrentStatement = asm;
     }
 
     public void addLabel(Label label, String filename, int lineNum) {
-        if (labels.containsKey(label.name))
-            syntaxError(filename, lineNum, label.name + " was already declared");
-        labels.put(label.name, label);
+        if (mLabels.containsKey(label.mName)) {
+            syntaxError(filename, lineNum, label.mName + " was already declared");
+        }
+        mLabels.put(label.mName, label);
     }
 
     public void addConstant(String name, Data constant, String filename, int lineNum) {
-        if (constants.containsKey(name))
+        if (mConstants.containsKey(name)) {
             syntaxError(filename, lineNum, name + " was already declared");
-        constants.put(name, constant);
+        }
+        mConstants.put(name, constant);
     }
 
     public static void main(String[] args) {
         String main = null;
-        String sourceDirectory = null;
         String binary = null;
-        String log = null;
         Set<String> files = new HashSet<String>();
         for (int i = 0; i < args.length; i++) {
             if (args[i].equals("-m")) {
                 main = args[++i];
-            } else if (args[i].equals("-s")) {
-                sourceDirectory = args[++i];
             } else if (args[i].equals("-b")) {
                 binary = args[++i];
-            } else if (args[i].equals("-l")) {
-                log = args[++i];
             } else {
-                files.add(args[i]);
+                files.add(new File(args[i]).getAbsolutePath());
             }
         }
-        if (main == null || sourceDirectory == null || binary == null || log == null || files.size() == 0) {
-            error("Usage:\nAssembler -m <main> -s <source-directory> -b <binary> -l <log> <files>");
+        if (main == null || binary == null || files.size() == 0) {
+            error("Usage:\nAssembler -m <main> -b <binary> <files>");
         }
-        final Assembler assembler = new Assembler(main, sourceDirectory, binary, log, files);
+        for (String file : files) {
+            if (file.endsWith(main)) {
+                // Convert main to a full file path
+                main = file;
+            }
+        }
+        final Assembler assembler = new Assembler(main, binary, files);
         assembler.run();
     }
 

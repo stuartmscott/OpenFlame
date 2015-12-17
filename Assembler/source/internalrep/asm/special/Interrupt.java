@@ -28,37 +28,37 @@ public class Interrupt extends Special implements Linkable {
     public static final int KERNEL_EXIT = 9;
     public static final int KERNEL_RECEIVE = 10;
     public static final int KERNEL_SEND = 11;
-    public static final int KERNEL_ALLOC = 12;
+    public static final int KERNEL_ALLOCATE = 12;
     public static final int KERNEL_FREE = 13;
 
-    private long interruptId;
-    private String constant;
+    private long mInterruptId;
+    private String mConstant;
 
     public Interrupt(long interruptId, String comment) {
-        super(INTR, comment);
-        this.interruptId = interruptId;
+        super(INTERRUPT, comment);
+        mInterruptId = interruptId;
     }
 
     public Interrupt(String constant, String comment) {
-        super(INTR, comment);
-        this.constant = constant;
+        super(INTERRUPT, comment);
+        mConstant = constant;
     }
 
     public void link(Linker linker) {
-        if (constant != null) {
-            interruptId = linker.getConstant(constant);
+        if (mConstant != null) {
+            mInterruptId = linker.getConstant(mConstant);
         }
     }
 
     public long emit() {
-        return super.emit() | (interruptId << 18L);
+        return super.emit() | (mInterruptId << 18L);
     }
 
     public String toString() {
-        if (constant != null) {
-            return "intr " + constant + super.toString();
+        if (mConstant != null) {
+            return "intr " + mConstant + super.toString();
         }
-        return "intr " + interruptId + super.toString();
+        return "intr " + mInterruptId + super.toString();
     }
 
 }

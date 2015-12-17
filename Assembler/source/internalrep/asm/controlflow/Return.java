@@ -23,21 +23,21 @@ import io.Emittable;
 
 public class Return extends AsmStmt implements Emittable {
 
-    private int addrRegIndex;
+    private int mAddressRegister;
 
-    public Return(int addrRegIndex, String comment) {
+    public Return(int addressRegister, String comment) {
         super(comment);
-        // sets the pc to the value in addrReg
-        this.addrRegIndex = addrRegIndex;
+        // sets the pc to the value in addressRegister
+        mAddressRegister = addressRegister;
     }
 
     public long emit() {
-        // 0000 0010 reg
-        return (2L << 56) | addrRegIndex;
+        // 0000 0010 register
+        return (2L << 56) | mAddressRegister;
     }
 
     public String toString() {
-        return "ret r" + addrRegIndex + super.toString();
+        return "ret r" + mAddressRegister + super.toString();
     }
 
 }

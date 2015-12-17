@@ -12,27 +12,27 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-java_jar(
+JavaJar(
     name = "Assembler"
-    source = find("source")
+    source = Find("source")
     main_class = "main.Assembler"
 )
 
-java_jar(
-    name = "AssemblerTest"
-    source = find("tests/source")
-    main_class = "main.AssemblerTest"
-    library = [
-        "Assembler"
-        "junit"
-    ]
-)
-
-java_junit(
-    name = "AssemblerTestResult"
-    library = [
-        "AssemblerTest"
-        "Assembler"
-    ]
-    main_class = "main.AllTests"
-)
+#JavaJar(
+#    name = "AssemblerTest"
+#    source = Find("tests/source")
+#    main_class = "main.AssemblerTest"
+#    library = [
+#        "Assembler"
+#        "junit"
+#    ]
+#)
+#
+#JavaJUnit(
+#    name = "AssemblerTestResult"
+#    library = [
+#        "AssemblerTest"
+#        "Assembler"
+#    ]
+#    main_class = "main.AllTests"
+#)

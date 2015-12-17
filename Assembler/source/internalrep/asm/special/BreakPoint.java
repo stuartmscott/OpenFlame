@@ -20,19 +20,19 @@ package internalrep.asm.special;
 
 public class BreakPoint extends Special {
 
-    private long id;
+    private long mId;
 
     public BreakPoint(long id, String comment) {
         super(BREAK, comment);
-        this.id = id;
+        mId = id;
     }
 
     public String toString() {
-        return "break " + id + super.toString();
+        return "break " + mId + super.toString();
     }
 
     public long emit() {
-        return super.emit() | (id << 18L);
+        return super.emit() | (mId << 18L);
     }
 
 }

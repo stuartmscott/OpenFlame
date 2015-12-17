@@ -26,55 +26,57 @@ import linker.Linker;
 
 public class Load extends AsmStmt implements Emittable, Linkable {
 
-    private long displacement;
-    private int baseRegIndex;
-    private int destRegIndex;
-    private boolean isLabel = false;
-    private Label label;
-    private String name;
+    private long mOffset;
+    private int mBaseRegister;
+    private int mDestinationRegister;
+    private boolean mIsLabel = false;
+    private Label mLabel;
+    private String mName;
 
-    public Load(int baseRegIndex, long displacement, int destRegIndex, String comment) {
+    public Load(int baseRegister, long offset, int destinationRegister, String comment) {
         super(comment);
-        // Loads into destReg, the value at mem[baseReg+displacement]
-        this.baseRegIndex = baseRegIndex;
-        this.displacement = displacement;
-        this.destRegIndex = destRegIndex;
+        // Loads into destinationRegister, the value at memory[baseRegister+offset]
+        mBaseRegister = baseRegister;
+        mOffset = offset;
+        mDestinationRegister = destinationRegister;
     }
 
-    public Load(int baseRegIndex, String name, int destRegIndex, boolean isLabel, String comment) {
+    public Load(int baseRegister, String name, int destinationRegister, boolean isLabel, String comment) {
         super(comment);
-        this.baseRegIndex = baseRegIndex;
-        this.name = name;
-        this.destRegIndex = destRegIndex;
-        this.isLabel = isLabel;
+        mBaseRegister = baseRegister;
+        mName = name;
+        mDestinationRegister = destinationRegister;
+        mIsLabel = isLabel;
     }
 
     protected void resolve() {
-        if (isLabel)
-            displacement = label.getAbsolute();
+        if (mIsLabel) {
+            mOffset = mLabel.getAbsolute();
+        }
     }
 
     public void link(Linker linker) {
-        if (name != null) {
-            if (isLabel)
-                label = linker.getLabel(name);
-            else
-                displacement = linker.getConstant(name);
+        if (mName != null) {
+            if (mIsLabel) {
+                mLabel = linker.getLabel(mName);
+            } else {
+                mOffset = linker.getConstant(mName);
+            }
         }
     }
 
     public long emit() {
-        // 0100 offset base dest
+        // 0100 offset base destination
         resolve();
-        return (4L << 60L) | (displacement << 12L) | (baseRegIndex << 6L) | (destRegIndex);
+        return (4L << 60L) | (mOffset << 12L) | (mBaseRegister << 6L) | (mDestinationRegister);
     }
 
     public String toString() {
         resolve();
-        if (name != null) {
-            return "load r" + baseRegIndex + " " + name + " r" + destRegIndex + super.toString();
+        if (mName != null) {
+            return "load r" + mBaseRegister + " " + mName + " r" + mDestinationRegister + super.toString();
         }
-        return "load r" + baseRegIndex + " " + displacement + " r" + destRegIndex + super.toString();
+        return "load r" + mBaseRegister + " " + mOffset + " r" + mDestinationRegister + super.toString();
     }
 
 }

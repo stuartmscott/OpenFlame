@@ -27,60 +27,63 @@ import main.Assembler;
 
 public class LoadC extends AsmStmt implements Emittable, Linkable {
 
-    private long constant;
-    private int destRegIndex;
-    private Label label;
-    private boolean isLabel = false;
-    private String name;
+    private static final double MAX_VALUE = Math.pow(2, 48);
+    private long mConstant;
+    private int mDestinationRegister;
+    private Label mLabel;
+    private boolean mIsLabel = false;
+    private String mName;
 
-    public LoadC(long constant, int destRegIndex, String comment) {
+    public LoadC(long constant, int destinationRegister, String comment) {
         super(comment);
-        // Loads constant into destReg
-        this.constant = constant;
-        this.destRegIndex = destRegIndex;
+        // Loads constant into destinationRegister
+        mConstant = constant;
+        mDestinationRegister = destinationRegister;
     }
 
-    public LoadC(String name, int destRegIndex, boolean isLabel, String comment) {
+    public LoadC(String name, int destinationRegister, boolean isLabel, String comment) {
         super(comment);
-        this.name = name;
-        this.destRegIndex = destRegIndex;
-        this.isLabel = isLabel;
+        mName = name;
+        mDestinationRegister = destinationRegister;
+        mIsLabel = isLabel;
     }
 
     private void resolve() {
-        if (isLabel) {
-            constant = label.getAbsolute();
+        if (mIsLabel) {
+            mConstant = mLabel.getAbsolute();
         }
     }
 
     public void link(Linker linker) {
-        if (name != null) {
-            if (isLabel)
-                label = linker.getLabel(name);
-            else
-                constant = linker.getConstant(name);
+        if (mName != null) {
+            if (mIsLabel) {
+                mLabel = linker.getLabel(mName);
+            } else {
+                mConstant = linker.getConstant(mName);
+            }
         }
     }
 
     public long emit() {
-        // 0001 constant dest
+        // 0001 constant destination
         resolve();
-        if (constant >= Math.pow(2, 48))
-            Assembler.generatorError(null, "constant in loadc is greater than max value");
-        else if (constant < 0)
+        if (mConstant >= MAX_VALUE) {
+            Assembler.generatorError(null, "constant in loadc is greater than MAX_VALUE (2^48)");
+        } else if (mConstant < 0) {
             Assembler.generatorError(null, "constant in loadc is less than zero");
-        return (1L << 60L) | (constant << 12L) | (destRegIndex);
+        }
+        return (1L << 60L) | (mConstant << 12L) | (mDestinationRegister);
     }
 
     public String toString() {
         resolve();
-        if (name != null) {
-            return "loadc " + name + " r" + destRegIndex + super.toString();
+        if (mName != null) {
+            return "loadc " + mName + " r" + mDestinationRegister + super.toString();
         }
-        if (isLabel) {
-            return "loadc " + label.name + " r" + destRegIndex + super.toString();
+        if (mIsLabel) {
+            return "loadc " + mLabel.mName + " r" + mDestinationRegister + super.toString();
         }
-        return "loadc " + constant + " r" + destRegIndex + super.toString();
+        return "loadc " + mConstant + " r" + mDestinationRegister + super.toString();
     }
 
 }

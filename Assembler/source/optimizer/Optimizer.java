@@ -25,29 +25,29 @@ import java.util.List;
 
 public class Optimizer {
 
-    private AsmStmt stmt;
+    private AsmStmt mStatement;
 
-    public Optimizer(AsmStmt stmt) {
-        this.stmt = stmt;
+    public Optimizer(AsmStmt statement) {
+        mStatement = statement;
     }
 
     public List<Emittable> reduce() {
         // TODO patterns to look for
         // register getting written twice without a read in between (or jump/call/ret/intr/iret)
-        // copy where source and dest are the same
+        // copy where source and destination are the same
         // jump where target is next pc
-        List<Emittable> stmts = new ArrayList<Emittable>();
-        AsmStmt s = stmt;
+        List<Emittable> statements = new ArrayList<Emittable>();
+        AsmStmt statement = mStatement;
         long address = 0;
-        while (s != null) {
-            s.setAddress(address);
-            if (s instanceof Emittable) {
-                stmts.add((Emittable) s);
+        while (statement != null) {
+            statement.setAddress(address);
+            if (statement instanceof Emittable) {
+                statements.add((Emittable) statement);
                 address++;
             }
-            s = s.next;
+            statement = statement.mNext;
         }
-        return stmts;
+        return statements;
     }
 
 }

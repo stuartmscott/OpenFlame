@@ -20,13 +20,13 @@ package internalrep.asm.controlflow;
 
 public class Jlz extends Jump {
 
-    public Jlz(int condRegIndex, String dest, String comment) {
-        super(LZ, condRegIndex, dest, comment);
-        // if condReg less than 0, program flow will be directed to dest
+    public Jlz(int conditionRegister, String destination, String comment) {
+        super(LZ, conditionRegister, destination, comment);
+        // if conditionRegister less than 0, program flow will be directed to destination
     }
 
     public String toString() {
-        return "jlz r" + condRegIndex + " " + dest + super.toString();
+        return "jlz r" + mConditionRegister + " " + mDestination + super.toString();
     }
 
 }

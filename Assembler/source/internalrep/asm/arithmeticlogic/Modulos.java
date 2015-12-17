@@ -20,14 +20,14 @@ package internalrep.asm.arithmeticlogic;
 
 public class Modulos extends AluInst {
 
-    public Modulos(boolean isFloat, int srcReg1, int srcReg2, int destReg, String comment) {
-        // Modulus of srcReg1 by srcReg2 and puts result in destReg
-        // destReg = srcReg1%srcReg2
-        super(isFloat, MODULOS, srcReg1, srcReg2, destReg, comment);
+    public Modulos(boolean isFloat, int source1, int source2, int destination, String comment) {
+        // Modulus of source1 by source2 and puts result in destination
+        // destination = source1%source2
+        super(isFloat, MODULOS, source1, source2, destination, comment);
     }
 
     public String toString() {
-        return "mod r" + mSource1Index + " r" + mSource2Index + " r" + mDestinationIndex + super.toString();
+        return "mod r" + mSource1 + " r" + mSource2 + " r" + mDestination + super.toString();
     }
 
 }

@@ -20,15 +20,15 @@ package lexer;
 
 public class Lexem {
 
-    public Category cat;
-    public String regex;
-    
-    public Lexem(Category c, String r) {
-        this.cat = c;
-        this.regex = r;
+    public Category mCategory;
+    public String mRegex;
+
+    public Lexem(Category category, String regex) {
+        this.mCategory = category;
+        this.mRegex = regex;
     }
-    
+
     public String toString() {
-        return cat+" : "+regex;
+        return mCategory + " : " + mRegex;
     }
 }

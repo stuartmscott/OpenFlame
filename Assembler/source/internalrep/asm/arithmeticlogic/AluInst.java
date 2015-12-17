@@ -32,23 +32,23 @@ public abstract class AluInst extends AsmStmt implements Emittable {
 
     protected final boolean mIsFloat;
     protected final long mType;
-    protected final int mSource1Index;
-    protected final int mSource2Index;
-    protected final int mDestinationIndex;
+    protected final int mSource1;
+    protected final int mSource2;
+    protected final int mDestination;
 
     public AluInst(boolean isFloat, long type, int source1, int source2, int destination, String comment) {
         super(comment);
         mIsFloat = isFloat;
         mType = type;
-        mSource1Index = source1;
-        mSource2Index = source2;
-        mDestinationIndex = destination;
+        mSource1 = source1;
+        mSource2 = source2;
+        mDestination = destination;
     }
 
     public long emit() {
         // 0000 1f type reg reg reg
         long flt = mIsFloat ? 1 : 0;
-        return (1L << 59L) | (flt<< 58L) | (mType << 54L) | (mSource1Index << 12L) | (mSource2Index << 6L) | (mDestinationIndex);
+        return (1L << 59L) | (flt<< 58L) | (mType << 54L) | (mSource1 << 12L) | (mSource2 << 6L) | (mDestination);
     }
 
 }

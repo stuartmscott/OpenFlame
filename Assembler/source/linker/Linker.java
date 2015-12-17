@@ -22,50 +22,49 @@ import internalrep.asm.AsmStmt;
 import internalrep.asm.Data;
 import internalrep.asm.controlflow.Label;
 
-import java.util.ArrayList;
 import java.util.Map;
 
 import main.Assembler;
 
 public class Linker {
 
-    private final Map<String, Data> constants;
-    private final Map<String, Label> labels;
-    private final AsmStmt stmt;
+    private final Map<String, Data> mConstants;
+    private final Map<String, Label> mLabels;
+    private final AsmStmt mStatement;
 
-    public Linker(Map<String, Data> constants, Map<String, Label> labels, AsmStmt stmt) {
-        this.constants = constants;
-        this.labels = labels;
-        this.stmt = stmt;
+    public Linker(Map<String, Data> constants, Map<String, Label> labels, AsmStmt statement) {
+        this.mConstants = constants;
+        this.mLabels = labels;
+        this.mStatement = statement;
     }
 
     public void link() {
-        AsmStmt s = stmt;
-        while (s != null) {
-            if (s instanceof Linkable) {
-                ((Linkable) s).link(this);
+        AsmStmt statement = mStatement;
+        while (statement != null) {
+            if (statement instanceof Linkable) {
+                ((Linkable) statement).link(this);
             }
-            s = s.next;
+            statement = statement.mNext;
         }
     }
 
     public long getConstant(String name) {
-        Data d = constants.get(name);
-        if (d == null) {
+        Data data = mConstants.get(name);
+        if (data == null) {
             Assembler.linkError(name + " was not declared");
         }
-        return d.value;
+        return data.mValue;
     }
 
     public Label getLabel(String name) {
-        Label l = labels.get(name);
-        if (l == null) {
-            for (String key: labels.keySet()) {
-                System.out.println(key + " : " + labels.get(key));
+        Label label = mLabels.get(name);
+        if (label == null) {
+            for (String key: mLabels.keySet()) {
+                System.out.println(key + " : " + mLabels.get(key));
             }
             Assembler.linkError(name + " was not declared");
         }
-        l.references++;
-        return l;
+        label.mReferences++;
+        return label;
     }
 }

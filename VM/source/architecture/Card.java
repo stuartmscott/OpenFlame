@@ -255,13 +255,13 @@ public class Card extends Clockable implements ICard {
                         return new Wait(d.mContext);
                     case Special.NOOP:
                         return new Noop(d.mContext);
-                    case Special.CMD:
+                    case Special.COMMAND:
                         return new Command(d.mContext, d.mConstant32Bit, d.mRegister2);
                     case Special.SIGNAL:
                         return new Signal(d.mContext, d.mRegister2);
-                    case Special.INTR:
+                    case Special.INTERRUPT:
                         return new Interrupt(d.mContext, d.mConstant32Bit);
-                    case Special.IRET:
+                    case Special.INTERRUPT_RETURN:
                         return new InterruptReturn(d.mContext, d.mRegister2);
                     case Special.LOCK:
                         return new Lock(d.mContext);

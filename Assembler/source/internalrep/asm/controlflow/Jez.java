@@ -21,13 +21,13 @@ package internalrep.asm.controlflow;
 
 public class Jez extends Jump {
 
-    public Jez(int condRegIndex, String dest, String comment) {
-        super(EZ, condRegIndex, dest, comment);
-        // if condReg contains 0, program flow will be directed to dest
+    public Jez(int conditionRegister, String destination, String comment) {
+        super(EZ, conditionRegister, destination, comment);
+        // if conditionRegister contains 0, program flow will be directed to label destination
     }
 
     public String toString() {
-        return "jez r" + condRegIndex + " " + dest + super.toString();
+        return "jez r" + mConditionRegister + " " + mDestination + super.toString();
     }
 
 }

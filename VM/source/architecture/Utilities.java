@@ -31,7 +31,7 @@ public class Utilities {
     public static final boolean CONTEXT_INTERRUPT = true;
     public static final boolean INSTRUCTION_DECODED = true;
 
-    public static final boolean REG_BANK = false;//Reads/writes to registers
+    public static final boolean REG_BANK = true;//Reads/writes to registers
 
     //Memory hierarchy
     public static final boolean CACHE_COMMAND = false;//When a read/write is issued to cache
@@ -41,7 +41,7 @@ public class Utilities {
 
     static {
         try {
-            sTraceFile = new PrintWriter(new File("build/trace.out"));
+            sTraceFile = new PrintWriter(new File("out/trace.out"));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }

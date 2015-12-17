@@ -28,24 +28,24 @@ import java.util.List;
 
 public class Writer {
 
-    private final File outFile;
-    private final File logFile;
-    private final List<Emittable> stmts;
+    private final File mOutFile;
+    private final File mLogFile;
+    private final List<Emittable> mStatements;
 
     public Writer(File outFile, File logFile, List<Emittable> stmts) {
-        this.outFile = outFile;
-        this.logFile = logFile;
-        this.stmts = stmts;
+        mOutFile = outFile;
+        mLogFile = logFile;
+        mStatements = stmts;
     }
 
     public void write() throws IOException {
-        if (!outFile.exists()) {
-            outFile.createNewFile();
+        if (!mOutFile.exists()) {
+            mOutFile.createNewFile();
         }
-        DataOutputStream out = new DataOutputStream(new FileOutputStream(outFile));
-        PrintWriter log = new PrintWriter(logFile);
+        DataOutputStream out = new DataOutputStream(new FileOutputStream(mOutFile));
+        PrintWriter log = new PrintWriter(mLogFile);
         // write instructions
-        for (Emittable e : stmts) {
+        for (Emittable e : mStatements) {
             out.writeLong(e.emit());
             log.write(e.getAddress() + " : " + e + "\n");
         }

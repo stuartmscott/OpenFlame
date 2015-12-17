@@ -24,9 +24,22 @@ import architecture.isa.Instruction;
 public interface IDecoder {
 
     /**
-     * 
-     * @param context
-     * @return
+     * Decodes an instruction for the given context.
+     *
+     * Instruction Format
+     * 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000 0000
+     *
+     * 1ppb cccc cccc cccc cccc cccc cccc cccc cccc cccc cccc cccc cccc ---- --22 2222 - jump
+     * 010o cccc cccc cccc cccc cccc cccc cccc cccc cccc cccc cccc cccc 1111 1122 2222 - load/store
+     * 011o mmmm mmmm mmmm mmmm mmmm mmmm mmmm mmmm mmmm mmmm mmmm mmmm mmmm mmmm mmmm - push/pop
+     * 001- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- - free/reserved
+     * 0001 cccc cccc cccc cccc cccc cccc cccc cccc cccc cccc cccc cccc ---- --22 2222 - loadc
+     * 0000 1ftt ttcc cccc cccc cccc cccc cccc cccc cccc cccc cc00 0000 1111 1122 2222 - alu
+     * 0000 01tt ttcc cccc cccc cccc cccc cccc cccc cccc cccc cc-- ---- 1111 1122 2222 - special
+     * 0000 001o ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- ---- --22 2222 - call/return
+     *
+     * @return the decoded instruction or an unsupported operation interrupt if the instruction
+     * cannot be decoded.
      */
     Instruction decode(IContext context);
 }

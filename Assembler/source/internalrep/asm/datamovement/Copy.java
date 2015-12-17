@@ -22,12 +22,12 @@ import internalrep.asm.arithmeticlogic.Add;
 
 public class Copy extends Add {
 
-    public Copy(int srcRegIndex, int destRegIndex, String comment) {
-        super(false, srcRegIndex, 0, destRegIndex, comment);
-        // Copies value in srcReg into destReg
-        if (destRegIndex < 2) {
+    public Copy(int source, int destination, String comment) {
+        super(false, source, 0, destination, comment);
+        // Copies value in sourceRegister into destinationRegister
+        if (destination < 2) {
             System.out.println("Copy does nothing: cannot write to r0 or r1");
-        } else if (mSource1Index == destRegIndex) {
+        } else if (mSource1 == destination) {
             System.out.println("Copy does nothing: registers are the same");
         }
     }

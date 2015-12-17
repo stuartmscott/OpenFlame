@@ -20,14 +20,14 @@ package internalrep.asm.arithmeticlogic;
 
 public class Divide extends AluInst {
 
-    public Divide(boolean isFloat, int srcReg1, int srcReg2, int destReg, String comment) {
-        // Divides srcReg1 by srcReg2 and put result in destReg
-        // destReg = srcReg1/srcReg2
-        super(isFloat, DIVIDE, srcReg1, srcReg2, destReg, comment);
+    public Divide(boolean isFloat, int source1, int source2, int destination, String comment) {
+        // Divides source1 by source2 and put result in destination
+        // destination = source1/source2
+        super(isFloat, DIVIDE, source1, source2, destination, comment);
     }
 
     public String toString() {
-        return "div r" + mSource1Index + " r" + mSource2Index + " r" + mDestinationIndex + super.toString();
+        return "div r" + mSource1 + " r" + mSource2 + " r" + mDestination + super.toString();
     }
 
 }

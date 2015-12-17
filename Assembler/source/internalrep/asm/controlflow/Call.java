@@ -23,22 +23,22 @@ import io.Emittable;
 
 public class Call extends AsmStmt implements Emittable {
 
-    private int addrRegIndex;
+    private int mAddressRegister;
 
-    public Call(int addrRegIndex, String comment) {
+    public Call(int addressRegister, String comment) {
         super(comment);
-        // calls the function at address in addrReg
+        // calls the function at address in addressRegister
         // if the context isn't handling an interrupt, this adds codeBase to the address
-        this.addrRegIndex = addrRegIndex;
+        mAddressRegister = addressRegister;
     }
 
     public long emit() {
         // 0000 0011 reg
-        return (3L << 56) | addrRegIndex;
+        return (3L << 56) | mAddressRegister;
     }
 
     public String toString() {
-        return "call r" + addrRegIndex + super.toString();
+        return "call r" + mAddressRegister + super.toString();
     }
 
 }
