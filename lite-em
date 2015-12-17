@@ -15,4 +15,4 @@
 # limitations under the License.
 
 # TODO error if match/openflamebuild,junit,mockito or any other libraries don't exist
-java -cp libraries/Match-0.2.jar:libraries/OpenFlameBuild-0.1.jar main.Match .
+java -cp libraries/Match-0.3.jar:libraries/OpenFlameBuild-0.1.jar main.Match .
