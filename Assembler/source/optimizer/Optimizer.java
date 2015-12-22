@@ -18,16 +18,16 @@
  */
 package optimizer;
 
-import internalrep.asm.AsmStmt;
+import internalrep.assembly.AssemblyStatement;
 import io.Emittable;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Optimizer {
 
-    private AsmStmt mStatement;
+    private AssemblyStatement mStatement;
 
-    public Optimizer(AsmStmt statement) {
+    public Optimizer(AssemblyStatement statement) {
         mStatement = statement;
     }
 
@@ -37,7 +37,7 @@ public class Optimizer {
         // copy where source and destination are the same
         // jump where target is next pc
         List<Emittable> statements = new ArrayList<Emittable>();
-        AsmStmt statement = mStatement;
+        AssemblyStatement statement = mStatement;
         long address = 0;
         while (statement != null) {
             statement.setAddress(address);

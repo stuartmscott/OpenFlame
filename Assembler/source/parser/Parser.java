@@ -18,38 +18,38 @@
  */
 package parser;
 
-import internalrep.asm.AsmStmt;
-import internalrep.asm.Data;
-import internalrep.asm.arithmeticlogic.Add;
-import internalrep.asm.arithmeticlogic.Convert;
-import internalrep.asm.arithmeticlogic.Divide;
-import internalrep.asm.arithmeticlogic.Modulos;
-import internalrep.asm.arithmeticlogic.Multiply;
-import internalrep.asm.arithmeticlogic.Subtract;
-import internalrep.asm.controlflow.Call;
-import internalrep.asm.controlflow.Jez;
-import internalrep.asm.controlflow.Jle;
-import internalrep.asm.controlflow.Jlz;
-import internalrep.asm.controlflow.Jnz;
-import internalrep.asm.controlflow.Label;
-import internalrep.asm.controlflow.Return;
-import internalrep.asm.datamovement.Copy;
-import internalrep.asm.datamovement.Load;
-import internalrep.asm.datamovement.LoadC;
-import internalrep.asm.datamovement.Pop;
-import internalrep.asm.datamovement.Push;
-import internalrep.asm.datamovement.Store;
-import internalrep.asm.special.BreakPoint;
-import internalrep.asm.special.Command;
-import internalrep.asm.special.Halt;
-import internalrep.asm.special.Interrupt;
-import internalrep.asm.special.InterruptReturn;
-import internalrep.asm.special.Lock;
-import internalrep.asm.special.Noop;
-import internalrep.asm.special.Signal;
-import internalrep.asm.special.Sleep;
-import internalrep.asm.special.Unlock;
-import internalrep.asm.special.Wait;
+import internalrep.assembly.AssemblyStatement;
+import internalrep.assembly.Data;
+import internalrep.assembly.arithmeticlogic.Add;
+import internalrep.assembly.arithmeticlogic.Convert;
+import internalrep.assembly.arithmeticlogic.Divide;
+import internalrep.assembly.arithmeticlogic.Modulos;
+import internalrep.assembly.arithmeticlogic.Multiply;
+import internalrep.assembly.arithmeticlogic.Subtract;
+import internalrep.assembly.controlflow.Call;
+import internalrep.assembly.controlflow.Jez;
+import internalrep.assembly.controlflow.Jle;
+import internalrep.assembly.controlflow.Jlz;
+import internalrep.assembly.controlflow.Jnz;
+import internalrep.assembly.controlflow.Label;
+import internalrep.assembly.controlflow.Return;
+import internalrep.assembly.datamovement.Copy;
+import internalrep.assembly.datamovement.Load;
+import internalrep.assembly.datamovement.LoadC;
+import internalrep.assembly.datamovement.Pop;
+import internalrep.assembly.datamovement.Push;
+import internalrep.assembly.datamovement.Store;
+import internalrep.assembly.special.BreakPoint;
+import internalrep.assembly.special.Command;
+import internalrep.assembly.special.Halt;
+import internalrep.assembly.special.Interrupt;
+import internalrep.assembly.special.InterruptReturn;
+import internalrep.assembly.special.Lock;
+import internalrep.assembly.special.Noop;
+import internalrep.assembly.special.Signal;
+import internalrep.assembly.special.Sleep;
+import internalrep.assembly.special.Unlock;
+import internalrep.assembly.special.Wait;
 
 import java.io.File;
 import java.io.IOException;
@@ -124,11 +124,11 @@ public class Parser {
                 StringBuilder sb = new StringBuilder();
                 while (!mLexer.currentIs(Category.UPPERNAME)) {
                     sb.append(match(Category.LOWERNAME));
-                    match(Category.FSTOP);
+                    match(Category.FULL_STOP);
                     sb.append(File.separatorChar);
                 }
                 sb.append(match(Category.UPPERNAME));
-                sb.append(match(Category.FSTOP));
+                sb.append(match(Category.FULL_STOP));
                 String ext = match(Category.LOWERNAME);
                 sb.append(ext);
                 matchOptionalComment(); // ignored
@@ -187,7 +187,7 @@ public class Parser {
         }
     }
 
-    private AsmStmt matchStatement() {
+    private AssemblyStatement matchStatement() {
         int lineNumber = mLexer.getLineNumber();
         String value = mLexer.getCurrentValue();
         if (mLexer.currentIs(Category.LABEL)) {
@@ -335,9 +335,9 @@ public class Parser {
 
         int register = matchRegister();
         // If the next two tokens are full stops then match range, else match comma separated list
-        if (mLexer.currentIs(Category.FSTOP)) {
-            match(Category.FSTOP);
-            match(Category.FSTOP);
+        if (mLexer.currentIs(Category.FULL_STOP)) {
+            match(Category.FULL_STOP);
+            match(Category.FULL_STOP);
             int endRegister = matchRegister();
             if (ascending && (register <= i || endRegister <= register)) {
                 error("register list is not in ascending order");

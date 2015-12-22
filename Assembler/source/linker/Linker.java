@@ -18,9 +18,9 @@
  */
 package linker;
 
-import internalrep.asm.AsmStmt;
-import internalrep.asm.Data;
-import internalrep.asm.controlflow.Label;
+import internalrep.assembly.AssemblyStatement;
+import internalrep.assembly.Data;
+import internalrep.assembly.controlflow.Label;
 
 import java.util.Map;
 
@@ -30,16 +30,16 @@ public class Linker {
 
     private final Map<String, Data> mConstants;
     private final Map<String, Label> mLabels;
-    private final AsmStmt mStatement;
+    private final AssemblyStatement mStatement;
 
-    public Linker(Map<String, Data> constants, Map<String, Label> labels, AsmStmt statement) {
+    public Linker(Map<String, Data> constants, Map<String, Label> labels, AssemblyStatement statement) {
         this.mConstants = constants;
         this.mLabels = labels;
         this.mStatement = statement;
     }
 
     public void link() {
-        AsmStmt statement = mStatement;
+        AssemblyStatement statement = mStatement;
         while (statement != null) {
             if (statement instanceof Linkable) {
                 ((Linkable) statement).link(this);
