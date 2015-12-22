@@ -18,9 +18,9 @@
  */
 package main;
 
-import internalrep.asm.AsmStmt;
-import internalrep.asm.Data;
-import internalrep.asm.controlflow.Label;
+import internalrep.assembly.AssemblyStatement;
+import internalrep.assembly.Data;
+import internalrep.assembly.controlflow.Label;
 import io.Emittable;
 import io.Writer;
 
@@ -41,8 +41,8 @@ public class Assembler {
 
     private final Map<String, Label> mLabels = new HashMap<String, Label>();
     private final Map<String, Data> mConstants = new HashMap<String, Data>();
-    private AsmStmt mFirstStatement = null;
-    private AsmStmt mCurrentStatement = null;
+    private AssemblyStatement mFirstStatement = null;
+    private AssemblyStatement mCurrentStatement = null;
 
     private final String mMain;
     private final String mBinary;
@@ -66,9 +66,9 @@ public class Assembler {
         l.link();
         // optimizer
         final Optimizer o = new Optimizer(mFirstStatement);
-        List<Emittable> stmts = o.reduce();
+        List<Emittable> statements = o.reduce();
         // writer
-        final Writer w = new Writer(binaryFile, logFile, stmts);
+        final Writer w = new Writer(binaryFile, logFile, statements);
         try {
             w.write();
         } catch (IOException e) {
@@ -88,7 +88,7 @@ public class Assembler {
         p.parse();
     }
 
-    public void addStatement(AsmStmt asm) {
+    public void addStatement(AssemblyStatement asm) {
         if (mFirstStatement == null) {
             mFirstStatement = asm;
         } else {

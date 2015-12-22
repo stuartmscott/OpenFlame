@@ -21,7 +21,7 @@ package lexer;
 public enum Category {
 
     END_OF_FILE, NEW_LINE, WHITESPACE,
-    COLON, COMMA, FSTOP, //Special Characters
+    COLON, COMMA, FULL_STOP,
     COMMENT, UPPERNAME, LOWERNAME, NUMBER_LITERAL,
-    INCLUDE, PADDING, DATA, ASM, LABEL,//Assembly
+    INCLUDE, PADDING, DATA, ASM, LABEL,
 }

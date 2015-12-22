@@ -32,10 +32,10 @@ public class Writer {
     private final File mLogFile;
     private final List<Emittable> mStatements;
 
-    public Writer(File outFile, File logFile, List<Emittable> stmts) {
+    public Writer(File outFile, File logFile, List<Emittable> statements) {
         mOutFile = outFile;
         mLogFile = logFile;
-        mStatements = stmts;
+        mStatements = statements;
     }
 
     public void write() throws IOException {

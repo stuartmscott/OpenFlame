@@ -198,7 +198,7 @@ public class Lexer {
         LEXEMS.add(new Lexem(Category.WHITESPACE, "\\s"));
         LEXEMS.add(new Lexem(Category.COLON, ":"));
         // lexems.add(new Lexem(Category.COMMA, ","));
-        LEXEMS.add(new Lexem(Category.FSTOP, "\\."));
+        LEXEMS.add(new Lexem(Category.FULL_STOP, "\\."));
         LEXEMS.add(new Lexem(Category.COMMENT, "//.*\n"));
 
         // Assembly
